@@ -1,14 +1,22 @@
 import requests
 from bs4 import BeautifulSoup
 import xlsxwriter
+import re
 
 # 请求头
 headers = {
     'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
 }
 
+# 要保存的文件名
+filename = '万科未来城三期梦溪里.xlsx'
+# 要下载的地址，不含page的值
 url = 'http://www.tmsf.com/newhouse/property_330184_331788908_price.htm?isopen=1&presellid=12483310&buildingid=&area=&allprice=&housestate=1&housetype=1&page='
+# 要下载的页数
+pageNum = 48  # 1-48
 
+# 将对应的标签转成对应的数字，
+# 如<span class="numberone"></span>替换成1
 def replaceWithNum(markup):
     spans = markup.findAll('span')
     for span in spans:
@@ -37,6 +45,11 @@ def replaceWithNum(markup):
             span.replaceWith('.')
 
     return markup
+
+# 提取字符串中的数字，'1079876.8元'--> 1079867.8
+def getNumber(str):
+    sum = re.sub('[^\d\.]', '', str)
+    return float(sum)
 
 # 获取每页的数据
 def getPage(page):
@@ -89,18 +102,17 @@ def getPage(page):
     return list
 
 houseList = []
-pageNum = 48  # 1-48
+
 for num in range(1, pageNum + 1):
     houseList += getPage(num)
 
 print('正在将数据保存到文件中')
 
-filename = '万科未来城三期.xlsx'
 wb = xlsxwriter.Workbook(filename)
 sheet = wb.add_worksheet('三期')
 bold = wb.add_format({'bold': True})
 # 生成表头
-title = ['楼栋', '房号', '建筑面积', '套内建筑面积', '得房率', '申请毛坯单价', '装修价', '总价', '状态']
+title = ['楼栋', '房号', '建筑面积', '套内建筑面积', '得房率', '申请毛坯单价', '装修价', '总价', '状态', '首套3成', '二套6成']
 
 col = 0
 for head in title:
@@ -118,6 +130,8 @@ for item in houseList:
     sheet.write(row, 6, item['decoratePrice'])
     sheet.write(row, 7, item['totalPrice'])
     sheet.write(row, 8, item['status'])
+    sheet.write(row, 9, round(getNumber(item['totalPrice']) * 0.3, 2))
+    sheet.write(row, 10, round(getNumber(item['totalPrice']) * 0.6, 2))
     row += 1
 
 wb.close()
