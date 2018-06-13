@@ -9,11 +9,13 @@ headers = {
 }
 
 # 要保存的文件名
-filename = '万科未来城三期梦溪里.xlsx'
+filename = '柏悦中心.xlsx'
+# sheet名称
+sheetname = '6月'
 # 要下载的地址，不含page的值
-url = 'http://www.tmsf.com/newhouse/property_330184_331788908_price.htm?isopen=1&presellid=12483310&buildingid=&area=&allprice=&housestate=1&housetype=1&page='
+url = 'http://www.tmsf.com/newhouse/property_330184_480879819_price.htm?isopen=1&presellid=12484973&buildingid=&area=&allprice=&housestate=1&housetype=&page='
 # 要下载的页数
-pageNum = 48  # 1-48
+pageNum = 21  # 1-48
 
 # 将对应的标签转成对应的数字，
 # 如<span class="numberone"></span>替换成1
@@ -49,7 +51,18 @@ def replaceWithNum(markup):
 # 提取字符串中的数字，'1079876.8元'--> 1079867.8
 def getNumber(str):
     sum = re.sub('[^\d\.]', '', str)
-    return float(sum)
+    # 可能为空，是不可售状态，没有价格
+    if sum:
+        return float(sum)
+    else:
+        return '-'
+
+# 获取指定价格的几成
+def getCount(total, discount):
+    if total == '-':
+        return total
+    else:
+        return round(total * discount, 2)
 
 # 获取每页的数据
 def getPage(page):
@@ -109,7 +122,7 @@ for num in range(1, pageNum + 1):
 print('正在将数据保存到文件中')
 
 wb = xlsxwriter.Workbook(filename)
-sheet = wb.add_worksheet('三期')
+sheet = wb.add_worksheet(sheetname)
 bold = wb.add_format({'bold': True})
 # 生成表头
 title = ['楼栋', '房号', '建筑面积', '套内建筑面积', '得房率', '申请毛坯单价', '装修价', '总价', '状态', '首套3成', '二套6成']
@@ -130,8 +143,8 @@ for item in houseList:
     sheet.write(row, 6, item['decoratePrice'])
     sheet.write(row, 7, item['totalPrice'])
     sheet.write(row, 8, item['status'])
-    sheet.write(row, 9, round(getNumber(item['totalPrice']) * 0.3, 2))
-    sheet.write(row, 10, round(getNumber(item['totalPrice']) * 0.6, 2))
+    sheet.write(row, 9, getCount(getNumber(item['totalPrice']), 0.3))
+    sheet.write(row, 10, getCount(getNumber(item['totalPrice']), 0.6))
     row += 1
 
 wb.close()
