@@ -9,13 +9,13 @@ headers = {
 }
 
 # 要保存的文件名
-filename = '柏悦中心.xlsx'
+filename = '柏悦中心2.xlsx'
 # sheet名称
 sheetname = '6月'
 # 要下载的地址，不含page的值
 url = 'http://www.tmsf.com/newhouse/property_330184_480879819_price.htm?isopen=1&presellid=12484973&buildingid=&area=&allprice=&housestate=1&housetype=&page='
 # 要下载的页数
-pageNum = 21  # 1-48
+pageNum = 1  # 1-48
 
 # 将对应的标签转成对应的数字，
 # 如<span class="numberone"></span>替换成1
@@ -123,6 +123,12 @@ print('正在将数据保存到文件中')
 
 wb = xlsxwriter.Workbook(filename)
 sheet = wb.add_worksheet(sheetname)
+# 设置列宽
+sheet.set_column(0,3,15)
+sheet.set_column(4,4,10)
+sheet.set_column(5,7,15)
+sheet.set_column(8,8,10)
+sheet.set_column(9,10,15)
 bold = wb.add_format({'bold': True})
 # 生成表头
 title = ['楼栋', '房号', '建筑面积', '套内建筑面积', '得房率', '申请毛坯单价', '装修价', '总价', '状态', '首套3成', '二套6成']
