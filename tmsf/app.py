@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import xlsxwriter
 import re
+import time
 
 # 请求头
 headers = {
@@ -9,13 +10,13 @@ headers = {
 }
 
 # 要保存的文件名
-filename = '柏悦中心2.xlsx'
+filename = '未来海岸1017.xlsx'
 # sheet名称
-sheetname = '6月'
+sheetname = '10月'
 # 要下载的地址，不含page的值
-url = 'http://www.tmsf.com/newhouse/property_330184_480879819_price.htm?isopen=1&presellid=12484973&buildingid=&area=&allprice=&housestate=1&housetype=&page='
+url = 'http://www.tmsf.com/newhouse/property_330231_1162017875_price.htm?isopen=1&presellid=21244287&buildingid=&area=&allprice=&housestate=1&housetype=1&page='
 # 要下载的页数
-pageNum = 1  # 1-48
+pageNum = 17  # 1-48
 
 # 将对应的标签转成对应的数字，
 # 如<span class="numberone"></span>替换成1
@@ -118,6 +119,8 @@ houseList = []
 
 for num in range(1, pageNum + 1):
     houseList += getPage(num)
+    # 隔0.5s再获取
+    time.sleep(0.5)
 
 print('正在将数据保存到文件中')
 
